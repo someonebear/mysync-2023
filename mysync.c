@@ -49,5 +49,20 @@ int main(int argc, char *argv[])
     usage();
   }
 
+  DIR *directory;
+  while (argc > 0)
+  {
+    directory = opendir(*argv);
+    if (directory == NULL)
+    {
+      fprintf(stderr, "Directory \"%s\" could not be opened.\n", *argv);
+      perror("Error: ");
+      exit(EXIT_FAILURE);
+    }
+    printf("Opened: %s\n", *argv);
+    argc--;
+    argv++;
+  }
+
   return 0;
 }

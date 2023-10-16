@@ -3,6 +3,8 @@
 #include <string.h>
 #include <getopt.h>
 #include <stdbool.h>
+#include <dirent.h>
+#include <sys/types.h>
 
 // First colon makes getopt() return ':' if option arg is missing.
 #define OPTLIST ":ai:no:prv"
