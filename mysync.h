@@ -24,6 +24,3 @@ extern bool verbose;
 extern void usage(void);
 extern void validate_opt(int, char *[]);
 extern void read_dir(int, char *[]);
-
-// Global data structures
-extern DIR *directories[];

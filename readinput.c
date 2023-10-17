@@ -17,6 +17,7 @@ void validate_opt(int argc, char *argv[])
     switch (opt)
     {
     case 'a':
+      all_files = true;
       break;
     case 'i':
       break;
@@ -57,6 +58,10 @@ void find_files(DIR *dirp, char *dir_name)
     }
     else if (S_ISREG(stat_buffer.st_mode))
     {
+      if (dp->d_name[0] == '.' && !all_files)
+      {
+        continue;
+      }
       printf("File found: %s\n", dp->d_name);
     }
   }
