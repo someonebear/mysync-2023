@@ -41,10 +41,30 @@ void validate_opt(int argc, char *argv[])
   }
 }
 
+void find_files(DIR *dirp, char *dir_name)
+{
+  struct dirent *dp;
+  char fullpath[MAXPATHLEN];
+
+  while ((dp = readdir(dirp)) != NULL)
+  {
+    struct stat stat_buffer;
+    sprintf(fullpath, "%s/%s", dir_name, dp->d_name);
+    if (stat(fullpath, &stat_buffer) != 0)
+    {
+      perror("Error: ");
+      exit(EXIT_FAILURE);
+    }
+    else if (S_ISREG(stat_buffer.st_mode))
+    {
+      printf("File found: %s\n", dp->d_name);
+    }
+  }
+}
+
 void read_dir(int num_dir, char *dir[])
 {
   DIR *directories[num_dir];
-  // struct dirent *dp;
 
   for (int i = 0; i < num_dir; i++)
   {
@@ -59,8 +79,11 @@ void read_dir(int num_dir, char *dir[])
     dir++;
   }
 
+  dir -= num_dir;
   for (int i = 0; i < num_dir; i++)
   {
+    find_files(directories[i], *dir);
     closedir(directories[i]);
+    dir++;
   }
 }

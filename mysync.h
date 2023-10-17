@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <dirent.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/param.h>
 
 // First colon makes getopt() return ':' if option arg is missing.
 #define OPTLIST ":ai:no:prv"
