@@ -40,3 +40,27 @@ void validate_opt(int argc, char *argv[])
     }
   }
 }
+
+void read_dir(int num_dir, char *dir[])
+{
+  DIR *directories[num_dir];
+  // struct dirent *dp;
+
+  for (int i = 0; i < num_dir; i++)
+  {
+    directories[i] = opendir(*dir);
+    if (directories[i] == NULL)
+    {
+      fprintf(stderr, "Directory \"%s\" could not be opened.\n", *dir);
+      perror("Error: ");
+      exit(EXIT_FAILURE);
+    }
+    printf("Opened: %s\n", *dir);
+    dir++;
+  }
+
+  for (int i = 0; i < num_dir; i++)
+  {
+    closedir(directories[i]);
+  }
+}
