@@ -17,3 +17,6 @@ extern char *only_sync;
 extern bool same_permission;
 extern bool recursive;
 extern bool verbose;
+
+extern void usage(void);
+extern void validate_opt(int, char *[]);
