@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <dirent.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
@@ -34,7 +35,7 @@ typedef struct list_item
 {
   // Top-level directory that this item is under.
   char *top_level;
-  int mod_time;
+  time_t mod_time;
   // Just in case of collisions. Full path minus top-level.
   char *path_name;
   struct list_item *next;
