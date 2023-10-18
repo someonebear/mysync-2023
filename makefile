@@ -6,11 +6,10 @@ C11 = cc -std=c11
 CFLAGS = -Wall -Werror
 
 $(PROJECT) : $(OBJ)
-	$(C11) $(CFLAGS) -o $(PROJECT) $(OBJ)
-
+	$(C11) $(CFLAGS) -g -o $(PROJECT) $(OBJ)
 
 %.o : %.c $(HEADERS)
-	$(C11) $(CFLAGS) -c $<
+	$(C11) $(CFLAGS) -g -c $<
 
 clean:
 	rm -f $(PROJECT) $(OBJ)

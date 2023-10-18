@@ -42,7 +42,7 @@ void validate_opt(int argc, char *argv[])
   }
 }
 
-void count_files(DIR *dirp)
+void count_files(DIR *dirp, char *dir_name)
 {
   struct dirent *dp;
   char fullpath[MAXPATHLEN];
@@ -50,8 +50,10 @@ void count_files(DIR *dirp)
   while ((dp = readdir(dirp)) != NULL)
   {
     struct stat stat_buffer;
+    sprintf(fullpath, "%s/%s", dir_name, dp->d_name);
     if (stat(fullpath, &stat_buffer) != 0)
     {
+      fprintf(stderr, "File stats for %s could not be found.\n", dp->d_name);
       perror("Error: ");
       exit(EXIT_FAILURE);
     }
@@ -77,6 +79,7 @@ void find_files(DIR *dirp, char *dir_name)
     sprintf(fullpath, "%s/%s", dir_name, dp->d_name);
     if (stat(fullpath, &stat_buffer) != 0)
     {
+      fprintf(stderr, "File stats for %s could not be found.\n", dp->d_name);
       perror("Error: ");
       exit(EXIT_FAILURE);
     }
@@ -87,6 +90,7 @@ void find_files(DIR *dirp, char *dir_name)
         continue;
       }
       printf("File found: %s\n", dp->d_name);
+      hashmap_add(hashmap, dp->d_name, dir_name, stat_buffer.st_mtime);
     }
   }
 }
@@ -111,8 +115,16 @@ void read_dir(int num_dir, char *dir[])
   dir -= num_dir;
   for (int i = 0; i < num_dir; i++)
   {
-    count_files(directories[i]);
+    count_files(directories[i], *dir);
     rewinddir(directories[i]);
+    dir++;
+  }
+
+  hashmap = new_hashmap();
+
+  dir -= num_dir;
+  for (int i = 0; i < num_dir; i++)
+  {
     find_files(directories[i], *dir);
     closedir(directories[i]);
     dir++;

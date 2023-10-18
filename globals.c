@@ -7,3 +7,4 @@ bool recursive = false;
 bool verbose = false;
 
 int hashmap_size = 0;
+HASHMAP *hashmap = NULL;

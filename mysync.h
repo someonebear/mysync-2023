@@ -45,6 +45,8 @@ typedef LIST *HASHMAP;
 // Count of number of files, for hashmap size
 extern int hashmap_size;
 
+extern HASHMAP *hashmap;
+
 extern HASHMAP *new_hashmap(void);
 
 extern void hashmap_add(HASHMAP *, char *, char *, int);

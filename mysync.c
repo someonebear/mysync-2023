@@ -14,5 +14,7 @@ int main(int argc, char *argv[])
 
   read_dir(argc, argv);
 
+  print_hashmap(hashmap);
+
   return 0;
 }
