@@ -8,6 +8,14 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 
+// From Workshop 8
+#define CHECK_ALLOC(p)  \
+  if (p == NULL)        \
+  {                     \
+    perror(__func__);   \
+    exit(EXIT_FAILURE); \
+  }
+
 // First colon makes getopt() return ':' if option arg is missing.
 #define OPTLIST ":ai:no:prv"
 
@@ -19,6 +27,21 @@ extern char *only_sync;
 extern bool same_permission;
 extern bool recursive;
 extern bool verbose;
+
+// Hashmap declarations
+typedef struct list_item
+{
+  char *string;
+  struct list_item *next;
+} LIST;
+
+typedef LIST *hashmap;
+
+extern hashmap *new_hashmap(void);
+
+extern void hashmap_add(hashmap *, char *);
+
+extern bool hashmap_find(hashmap *, char *);
 
 // Global functions
 extern void usage(void);

@@ -1,6 +1,6 @@
 PROJECT = mysync
 HEADERS = $(PROJECT).h
-OBJ = mysync.o readinput.o globals.o
+OBJ = mysync.o directories.o globals.o hashmap.o
 
 C11 = cc -std=c11
 CFLAGS = -Wall -Werror
