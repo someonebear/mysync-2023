@@ -69,7 +69,7 @@ void print_list(LIST *list)
   {
     while (list != NULL)
     {
-      printf("File exists in: %s%s, mod_time: %i\n", list->top_level, list->path_name, list->mod_time);
+      printf("File \"%s\" exists in directory: %s, mod_time: %i\n", list->path_name, list->top_level, list->mod_time);
       list = list->next;
     }
   }
