@@ -6,5 +6,6 @@ bool same_permission = false;
 bool recursive = false;
 bool verbose = false;
 
+int num_files = 0;
 int hashmap_size = 0;
 HASHMAP *hashmap = NULL;

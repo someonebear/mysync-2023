@@ -2,7 +2,6 @@
 
 // TODO: Maybe move #include statements that only get used in one file to that file.
 // TODO: Check that functions only used in one file are only declared in that file.
-// TODO: Format the paths with appropriate '/' before storing.
 
 int main(int argc, char *argv[])
 {

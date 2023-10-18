@@ -36,7 +36,7 @@ typedef struct list_item
   // Top-level directory that this item is under.
   char *top_level;
   time_t mod_time;
-  // Just in case of collisions. Full path minus top-level.
+  // Just in case of collisions. Full path minus top-level, i.e. the key
   char *path_from_top;
   struct list_item *next;
 } LIST;
@@ -44,6 +44,7 @@ typedef struct list_item
 typedef LIST *HASHMAP;
 
 // Count of number of files, for hashmap size
+extern int num_files;
 extern int hashmap_size;
 
 extern HASHMAP *hashmap;
@@ -56,7 +57,12 @@ extern bool hashmap_find(HASHMAP *, char *, char *, int);
 
 extern void print_hashmap(HASHMAP *);
 
+// Global array for names of arrays passed to program.
+extern char *top_directories[];
+
 // Global functions
 extern void usage(void);
 extern void validate_opt(int, char *[]);
 extern void read_dir(int, char *[]);
+
+extern void find_difference(void);
