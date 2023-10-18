@@ -21,7 +21,7 @@ bool list_find(LIST *list, char *top_level, char *path_from_top)
   {
     if (strcmp(list->top_level, top_level) == 0)
     {
-      if (strcmp(list->path_name, path_from_top) == 0)
+      if (strcmp(list->path_from_top, path_from_top) == 0)
       {
         return true;
       }
@@ -39,8 +39,8 @@ LIST *new_list_item(char *top_level, char *path_from_top, int mtime)
   new->top_level = strdup(top_level);
   CHECK_ALLOC(new->top_level);
 
-  new->path_name = strdup(path_from_top);
-  CHECK_ALLOC(new->path_name);
+  new->path_from_top = strdup(path_from_top);
+  CHECK_ALLOC(new->path_from_top);
 
   new->mod_time = mtime;
   new->next = NULL;
@@ -70,7 +70,7 @@ void print_list(LIST *list)
     while (list != NULL)
     {
       time_t mtime = list->mod_time;
-      printf("File \"%s\" exists in directory: %s, (%s)\n", list->path_name, list->top_level, ctime(&mtime));
+      printf("File \"%s\" exists in directory: %s, (%s)\n", list->path_from_top, list->top_level, ctime(&mtime));
       list = list->next;
     }
   }

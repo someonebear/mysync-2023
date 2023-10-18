@@ -37,7 +37,7 @@ typedef struct list_item
   char *top_level;
   time_t mod_time;
   // Just in case of collisions. Full path minus top-level.
-  char *path_name;
+  char *path_from_top;
   struct list_item *next;
 } LIST;
 
