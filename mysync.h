@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <stdint.h>
 
 // From Workshop 8
 #define CHECK_ALLOC(p)  \
@@ -31,17 +32,26 @@ extern bool verbose;
 // Hashmap declarations
 typedef struct list_item
 {
-  char *string;
+  // Top-level directory that this item is under.
+  char *top_level;
+  int mod_time;
+  // Just in case of collisions. Full path minus top-level.
+  char *path_name;
   struct list_item *next;
 } LIST;
 
-typedef LIST *hashmap;
+typedef LIST *HASHMAP;
 
-extern hashmap *new_hashmap(void);
+// Count of number of files, for hashmap size
+extern int hashmap_size;
 
-extern void hashmap_add(hashmap *, char *);
+extern HASHMAP *new_hashmap(void);
 
-extern bool hashmap_find(hashmap *, char *);
+extern void hashmap_add(HASHMAP *, char *, char *, int);
+
+extern bool hashmap_find(HASHMAP *, char *, char *, int);
+
+extern void print_hashmap(HASHMAP *);
 
 // Global functions
 extern void usage(void);

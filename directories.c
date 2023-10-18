@@ -42,6 +42,30 @@ void validate_opt(int argc, char *argv[])
   }
 }
 
+void count_files(DIR *dirp)
+{
+  struct dirent *dp;
+  char fullpath[MAXPATHLEN];
+
+  while ((dp = readdir(dirp)) != NULL)
+  {
+    struct stat stat_buffer;
+    if (stat(fullpath, &stat_buffer) != 0)
+    {
+      perror("Error: ");
+      exit(EXIT_FAILURE);
+    }
+    else if (S_ISREG(stat_buffer.st_mode))
+    {
+      if (dp->d_name[0] == '.' && !all_files)
+      {
+        continue;
+      }
+      hashmap_size += 2;
+    }
+  }
+}
+
 void find_files(DIR *dirp, char *dir_name)
 {
   struct dirent *dp;
@@ -87,6 +111,8 @@ void read_dir(int num_dir, char *dir[])
   dir -= num_dir;
   for (int i = 0; i < num_dir; i++)
   {
+    count_files(directories[i]);
+    rewinddir(directories[i]);
     find_files(directories[i], *dir);
     closedir(directories[i]);
     dir++;
