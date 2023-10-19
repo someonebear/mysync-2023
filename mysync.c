@@ -3,6 +3,7 @@
 // TODO: Maybe move #include statements that only get used in one file to that file.
 // TODO: Check that functions only used in one file are only declared in that file.
 // TODO: free() dynamic memory as soon as they are finished.
+// TODO: put verbose condition before print statements.
 
 int main(int argc, char *argv[])
 {
@@ -18,9 +19,17 @@ int main(int argc, char *argv[])
 
   read_dir(argc, argv);
 
-  print_hashmap(hashmap_main);
+  if (verbose)
+  {
+    print_hashmap(hashmap_main);
+  }
 
   find_difference(argc);
+
+  if (!no_sync)
+  {
+    sync_files();
+  }
 
   return 0;
 }

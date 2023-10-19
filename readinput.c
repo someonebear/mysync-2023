@@ -22,6 +22,8 @@ void validate_opt(int argc, char *argv[])
     case 'i':
       break;
     case 'n':
+      no_sync = true;
+      verbose = true;
       break;
     case 'o':
       break;
@@ -31,6 +33,7 @@ void validate_opt(int argc, char *argv[])
       recursive = true;
       break;
     case 'v':
+      verbose = true;
       break;
     case '?':
       fprintf(stderr, "Invalid input: \"-%c\" is not a valid option.\n", optopt);
@@ -99,7 +102,10 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
       }
       if (mode == 's')
       {
-        printf("File found: %s\n", dp->d_name);
+        if (verbose)
+        {
+          printf("File found: %s\n", dp->d_name);
+        }
         sprintf(rel_path, "%s%s", path_from_top, dp->d_name);
         if (hashmap_add(hashmap_main, rel_path, top_level, stat_buffer.st_mtime))
         {
@@ -133,7 +139,10 @@ void read_dir(int num_dir, char *dirs[])
     // Opening each directory passed to program.
     directories[i] = opendir(*dirs);
     CHECK_ALLOC(*(directories + i));
-    printf("Opened: %s\n", *dirs);
+    if (verbose)
+    {
+      printf("Opened: %s\n", *dirs);
+    }
     dirs++;
   }
 
@@ -147,7 +156,10 @@ void read_dir(int num_dir, char *dirs[])
   }
   if (num_files == 0)
   {
-    printf("No files found.\n");
+    if (verbose)
+    {
+      printf("No files found.\n");
+    }
     return;
   }
 

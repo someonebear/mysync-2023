@@ -51,7 +51,10 @@ void find_difference(int num_dir)
           if (file->mod_time == newest_time)
           {
             hashmap_add(hashmap_newest, file->path_from_top, file->top_level, file->mod_time);
-            printf("The newest version of \"%s\" is in directory \"%s\"\n", file->path_from_top, file->top_level);
+            if (verbose)
+            {
+              printf("The newest version of \"%s\" is in directory \"%s\"\n", file->path_from_top, file->top_level);
+            }
           }
           // Add to newest_file
         }
