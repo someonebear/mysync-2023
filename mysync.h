@@ -73,4 +73,4 @@ extern void validate_opt(int, char *[]);
 extern void read_dir(int, char *[]);
 
 extern void find_difference(int);
-extern void sync_files(void);
+extern void sync_files(int);

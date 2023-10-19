@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
   if (!no_sync)
   {
-    sync_files();
+    sync_files(argc);
   }
 
   return 0;

@@ -4,9 +4,39 @@
 void create_dirs(char *path);
 // Go along entire path, if directory exists, move on, if it doesnt, create it.
 
-void sync_files()
+void fcopy(char *source, char *dest)
 {
   return;
+}
+
+void sync_files(int num_dir)
+{
+  for (int key = 0; key < key_count; key++)
+  {
+    LIST *file;
+    bool mask[num_dir];
+    for (int dir = 0; dir < num_dir; dir++)
+    {
+      mask[dir] = hashmap_find(hashmap_newest, keys[key], top_directories[dir]);
+      if (mask[dir] == true)
+      {
+        file = hashmap_return(hashmap_newest, keys[key], top_directories[dir]);
+      }
+    }
+
+    char source[MAXPATHLEN];
+    sprintf(source, "%s%s", file->top_level, file->path_from_top);
+    char dest[MAXPATHLEN];
+
+    for (int dir = 0; dir < num_dir; dir++)
+    {
+      if (mask[dir] == false)
+      {
+        sprintf(dest, "%s%s", top_directories[dir], keys[key]);
+        fcopy(source, dest);
+      }
+    }
+  }
 }
 // Create bitmask for each key, indicating which top directory has up-to-date, and which has older/doesnt exist
 // Call create_dir to create directories on path if file doesn't exist
@@ -25,7 +55,7 @@ void find_difference(int num_dir)
 
   for (int key = 0; key < key_count; key++)
   {
-    for (int pass = 0; pass < 3; pass++)
+    for (int pass = 0; pass < 2; pass++)
     {
       for (int dir = 0; dir < num_dir; dir++)
       {
