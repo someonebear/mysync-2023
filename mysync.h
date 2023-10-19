@@ -47,22 +47,26 @@ typedef LIST *HASHMAP;
 extern int num_files;
 extern int hashmap_size;
 
-extern HASHMAP *hashmap;
+extern HASHMAP *hashmap_main;
+extern HASHMAP *hashmap_newest;
 
 extern HASHMAP *new_hashmap(void);
 
 extern void hashmap_add(HASHMAP *, char *, char *, int);
 
-extern bool hashmap_find(HASHMAP *, char *, char *, int);
+extern bool hashmap_find(HASHMAP *, char *, char *);
 
 extern void print_hashmap(HASHMAP *);
 
 // Global array for names of arrays passed to program.
-extern char *top_directories[];
+extern char **top_directories;
+
+// Global array for keys of hashmap_main;
+extern char **keys;
 
 // Global functions
 extern void usage(void);
 extern void validate_opt(int, char *[]);
 extern void read_dir(int, char *[]);
 
-extern void find_difference(void);
+extern void find_difference(int);

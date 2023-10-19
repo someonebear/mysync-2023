@@ -65,6 +65,8 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
   struct dirent *dp;
   char fullpath[MAXPATHLEN];
   char rel_path[MAXPATHLEN];
+  int key_count = 0;
+
   while ((dp = readdir(dirp)) != NULL)
   {
     struct stat stat_buffer;
@@ -100,6 +102,8 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
       {
         printf("File found: %s\n", dp->d_name);
         sprintf(rel_path, "%s%s", path_from_top, dp->d_name);
+        *(keys + key_count) = strdup(rel_path);
+
         hashmap_add(hashmap_main, rel_path, top_level, stat_buffer.st_mtime);
       }
       else if (mode == 'c')
@@ -113,19 +117,21 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
 void read_dir(int num_dir, char *dirs[])
 {
   DIR *directories[num_dir];
-  char *top_directories[num_dir];
+
+  top_directories = calloc(num_dir, sizeof(char *));
+  CHECK_ALLOC(top_directories);
 
   for (int i = 0; i < num_dir; i++)
   {
     *dirs = add_slash(*dirs);
 
     // Storing directories passed to program
-    top_directories[i] = strdup(*dirs);
-    CHECK_ALLOC(top_directories[i]);
+    *(top_directories + i) = strdup(*dirs);
+    CHECK_ALLOC(*(top_directories + i));
 
     // Opening each directory passed to program.
     directories[i] = opendir(*dirs);
-    CHECK_ALLOC(directories[i]);
+    CHECK_ALLOC(*(directories + i));
     printf("Opened: %s\n", *dirs);
     dirs++;
   }
@@ -141,6 +147,7 @@ void read_dir(int num_dir, char *dirs[])
 
   hashmap_size = num_files * 2;
   hashmap_main = new_hashmap();
+  keys = calloc(num_files, sizeof(char *));
 
   dirs -= num_dir;
   for (int i = 0; i < num_dir; i++)

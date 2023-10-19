@@ -8,4 +8,9 @@ bool verbose = false;
 
 int num_files = 0;
 int hashmap_size = 0;
-HASHMAP *hashmap = NULL;
+
+HASHMAP *hashmap_main = NULL;
+HASHMAP *hashmap_newest = NULL;
+
+char **top_directories = NULL;
+char **keys = NULL;

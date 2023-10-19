@@ -102,7 +102,7 @@ void hashmap_add(HASHMAP *hashmap, char *path_from_top, char *top_level, int mti
   hashmap[h] = list_add(hashmap[h], path_from_top, top_level, mtime);
 }
 
-bool hashmap_find(HASHMAP *hashmap, char *path_from_top, char *top_level, int mtime)
+bool hashmap_find(HASHMAP *hashmap, char *path_from_top, char *top_level)
 {
   uint32_t h = hash_string(path_from_top) % hashmap_size;
   return list_find(hashmap[h], top_level, path_from_top);
