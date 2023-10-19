@@ -9,11 +9,6 @@
 // Create dir2 in dir3. etc. Check sample solution for if dir3 has file.txt, but not dir2.
 
 // List functions are not declared in header, as they are only used in this file.
-LIST *new_list(void)
-{
-  return NULL;
-}
-
 // Given pathname, check if file exists in given "top-level" directory.
 bool list_find(LIST *list, char *top_level, char *path_from_top)
 {
@@ -96,16 +91,55 @@ HASHMAP *new_hashmap(void)
   return new;
 }
 
-void hashmap_add(HASHMAP *hashmap, char *path_from_top, char *top_level, int mtime)
+bool hashmap_add(HASHMAP *hashmap, char *path_from_top, char *top_level, int mtime)
 {
   uint32_t h = hash_string(path_from_top) % hashmap_size;
+  char *current;
+  if (hashmap[h] == NULL)
+  {
+    current = "";
+  }
+  else
+  {
+    current = strdup(hashmap[h]->path_from_top);
+    CHECK_ALLOC(current);
+  }
+
   hashmap[h] = list_add(hashmap[h], path_from_top, top_level, mtime);
+
+  if (strcmp(hashmap[h]->path_from_top, current) == 0)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
 }
 
 bool hashmap_find(HASHMAP *hashmap, char *path_from_top, char *top_level)
 {
   uint32_t h = hash_string(path_from_top) % hashmap_size;
   return list_find(hashmap[h], top_level, path_from_top);
+}
+
+LIST *hashmap_return(HASHMAP *hashmap, char *path_from_top, char *top_level)
+{
+  uint32_t h = hash_string(path_from_top) % hashmap_size;
+  LIST *list = hashmap[h];
+
+  while (list != NULL)
+  {
+    if (strcmp(list->top_level, top_level) == 0)
+    {
+      if (strcmp(list->path_from_top, path_from_top) == 0)
+      {
+        return list;
+      }
+    }
+    list = list->next;
+  }
+  return NULL;
 }
 
 void print_hashmap(HASHMAP *hashmap)
