@@ -43,32 +43,6 @@ void validate_opt(int argc, char *argv[])
   }
 }
 
-void count_files(DIR *dirp, char *dir_name)
-{
-  struct dirent *dp;
-  char fullpath[MAXPATHLEN];
-
-  while ((dp = readdir(dirp)) != NULL)
-  {
-    struct stat stat_buffer;
-    sprintf(fullpath, "%s/%s", dir_name, dp->d_name);
-    if (stat(fullpath, &stat_buffer) != 0)
-    {
-      fprintf(stderr, "File stats for %s could not be found.\n", dp->d_name);
-      perror("Error: ");
-      exit(EXIT_FAILURE);
-    }
-    else if (S_ISREG(stat_buffer.st_mode))
-    {
-      if (dp->d_name[0] == '.' && !all_files)
-      {
-        continue;
-      }
-      num_files += 1;
-    }
-  }
-}
-
 // All directory paths will have trailing '/', and no '/' at the beginning when stored.
 // They can then be pieced together in format strings easier
 char *add_slash(char *string)
@@ -85,7 +59,8 @@ char *add_slash(char *string)
   }
 }
 
-void find_files(DIR *dirp, char *top_level, char *path_from_top)
+// Either 'c' mode for counting, or 's' mode for storing.
+void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
 {
   struct dirent *dp;
   char fullpath[MAXPATHLEN];
@@ -112,7 +87,7 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top)
       CHECK_ALLOC(recursive_dirp);
       // this should be path from top, and name of directory, so a new path from top for the next level.
       sprintf(rel_path, "%s%s/", path_from_top, dp->d_name);
-      find_files(recursive_dirp, top_level, rel_path);
+      find_files(recursive_dirp, top_level, rel_path, mode);
     }
 
     else if (S_ISREG(stat_buffer.st_mode))
@@ -121,9 +96,16 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top)
       {
         continue;
       }
-      printf("File found: %s\n", dp->d_name);
-      sprintf(rel_path, "%s%s", path_from_top, dp->d_name);
-      hashmap_add(hashmap, rel_path, top_level, stat_buffer.st_mtime);
+      if (mode == 's')
+      {
+        printf("File found: %s\n", dp->d_name);
+        sprintf(rel_path, "%s%s", path_from_top, dp->d_name);
+        hashmap_add(hashmap_main, rel_path, top_level, stat_buffer.st_mtime);
+      }
+      else if (mode == 'c')
+      {
+        num_files += 1;
+      }
     }
   }
 }
@@ -136,9 +118,12 @@ void read_dir(int num_dir, char *dirs[])
   for (int i = 0; i < num_dir; i++)
   {
     *dirs = add_slash(*dirs);
+
+    // Storing directories passed to program
     top_directories[i] = strdup(*dirs);
     CHECK_ALLOC(top_directories[i]);
 
+    // Opening each directory passed to program.
     directories[i] = opendir(*dirs);
     CHECK_ALLOC(directories[i]);
     printf("Opened: %s\n", *dirs);
@@ -148,18 +133,20 @@ void read_dir(int num_dir, char *dirs[])
   dirs -= num_dir;
   for (int i = 0; i < num_dir; i++)
   {
-    count_files(directories[i], *dirs);
+    // Count how many files exist, for hashmap size.
+    find_files(directories[i], *dirs, "", 'c');
     rewinddir(directories[i]);
     dirs++;
   }
 
   hashmap_size = num_files * 2;
-  hashmap = new_hashmap();
+  hashmap_main = new_hashmap();
 
   dirs -= num_dir;
   for (int i = 0; i < num_dir; i++)
   {
-    find_files(directories[i], *dirs, "");
+    // Store each file in hashmap.
+    find_files(directories[i], *dirs, "", 's');
     closedir(directories[i]);
     dirs++;
   }
