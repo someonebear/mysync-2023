@@ -52,9 +52,11 @@ extern HASHMAP *hashmap_newest;
 
 extern HASHMAP *new_hashmap(void);
 
-extern void hashmap_add(HASHMAP *, char *, char *, int);
+extern bool hashmap_add(HASHMAP *, char *, char *, int);
 
 extern bool hashmap_find(HASHMAP *, char *, char *);
+
+extern LIST *hashmap_return(HASHMAP *, char *, char *);
 
 extern void print_hashmap(HASHMAP *);
 
@@ -63,6 +65,7 @@ extern char **top_directories;
 
 // Global array for keys of hashmap_main;
 extern char **keys;
+extern int key_count;
 
 // Global functions
 extern void usage(void);
@@ -70,3 +73,4 @@ extern void validate_opt(int, char *[]);
 extern void read_dir(int, char *[]);
 
 extern void find_difference(int);
+extern void sync_files(void);

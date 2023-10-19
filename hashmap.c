@@ -91,6 +91,7 @@ HASHMAP *new_hashmap(void)
   return new;
 }
 
+// Return true if the key does not already exist.
 bool hashmap_add(HASHMAP *hashmap, char *path_from_top, char *top_level, int mtime)
 {
   uint32_t h = hash_string(path_from_top) % hashmap_size;

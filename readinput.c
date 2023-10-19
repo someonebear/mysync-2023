@@ -65,7 +65,6 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
   struct dirent *dp;
   char fullpath[MAXPATHLEN];
   char rel_path[MAXPATHLEN];
-  int key_count = 0;
 
   while ((dp = readdir(dirp)) != NULL)
   {
@@ -102,9 +101,11 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
       {
         printf("File found: %s\n", dp->d_name);
         sprintf(rel_path, "%s%s", path_from_top, dp->d_name);
-        *(keys + key_count) = strdup(rel_path);
-
-        hashmap_add(hashmap_main, rel_path, top_level, stat_buffer.st_mtime);
+        if (hashmap_add(hashmap_main, rel_path, top_level, stat_buffer.st_mtime))
+        {
+          *(keys + key_count) = strdup(rel_path);
+          key_count++;
+        }
       }
       else if (mode == 'c')
       {
@@ -144,8 +145,13 @@ void read_dir(int num_dir, char *dirs[])
     rewinddir(directories[i]);
     dirs++;
   }
+  if (num_files == 0)
+  {
+    printf("No files found.\n");
+    return;
+  }
 
-  hashmap_size = num_files * 2;
+  hashmap_size = (num_files * 2);
   hashmap_main = new_hashmap();
   keys = calloc(num_files, sizeof(char *));
 
