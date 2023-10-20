@@ -26,10 +26,7 @@ int main(int argc, char *argv[])
 
   find_difference(argc);
 
-  if (!no_sync)
-  {
-    sync_files(argc);
-  }
+  sync_files(argc);
 
   return 0;
 }
