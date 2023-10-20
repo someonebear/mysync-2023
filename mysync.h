@@ -70,7 +70,8 @@ extern int key_count;
 // Global functions
 extern void usage(void);
 extern void validate_opt(int, char *[]);
-extern void read_dir(int, char *[]);
+extern void process_dir(int, char *[]);
+extern void read_dir(int);
 
 extern void find_difference(int);
 extern void sync_files(int);

@@ -121,38 +121,62 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
   }
 }
 
-void read_dir(int num_dir, char *dirs[])
+void process_dir(int num_dir, char *dirs[])
 {
-  DIR *directories[num_dir];
-
   top_directories = calloc(num_dir, sizeof(char *));
   CHECK_ALLOC(top_directories);
 
   for (int i = 0; i < num_dir; i++)
   {
-    *dirs = add_slash(*dirs);
+    char *buf = strdup(*dirs);
+    char *p = strchr(buf, '~');
+    if (p == NULL)
+    {
+      *(top_directories + i) = strdup(buf);
+      CHECK_ALLOC(*(top_directories + i));
+    }
+    else
+    {
+      char *path = calloc(MAXPATHLEN, sizeof(char));
+      CHECK_ALLOC(path);
+      char *before;
+      char *after;
+      *p = '\0';
+      p++;
+      before = buf;
+      after = p;
+      snprintf(path, MAXPATHLEN, "%s%s%s", before, getenv("HOME"), after);
+      *(top_directories + i) = strdup(path);
+      CHECK_ALLOC(*(top_directories + i));
+      free(path);
+    }
+    free(buf);
+    dirs++;
+  }
+}
 
-    // Storing directories passed to program
-    *(top_directories + i) = strdup(*dirs);
-    CHECK_ALLOC(*(top_directories + i));
+void read_dir(int num_dir)
+{
+  DIR *directories[num_dir];
+
+  for (int i = 0; i < num_dir; i++)
+  {
+    *(top_directories + i) = add_slash(*(top_directories + i));
 
     // Opening each directory passed to program.
-    directories[i] = opendir(*dirs);
+    directories[i] = opendir(*(top_directories + i));
     CHECK_ALLOC(*(directories + i));
     if (verbose)
     {
-      printf("Opened: %s\n", *dirs);
+      printf("Opened: %s\n", *(top_directories + i));
     }
-    dirs++;
   }
 
-  dirs -= num_dir;
   for (int i = 0; i < num_dir; i++)
   {
     // Count how many files exist, for hashmap size.
-    find_files(directories[i], *dirs, "", 'c');
+    find_files(directories[i], *(top_directories + i), "", 'c');
     rewinddir(directories[i]);
-    dirs++;
   }
   if (num_files == 0)
   {
@@ -167,12 +191,10 @@ void read_dir(int num_dir, char *dirs[])
   hashmap_main = new_hashmap();
   keys = calloc(num_files, sizeof(char *));
 
-  dirs -= num_dir;
   for (int i = 0; i < num_dir; i++)
   {
     // Store each file in hashmap.
-    find_files(directories[i], *dirs, "", 's');
+    find_files(directories[i], *(top_directories + i), "", 's');
     closedir(directories[i]);
-    dirs++;
   }
 }

@@ -17,7 +17,9 @@ int main(int argc, char *argv[])
     usage();
   }
 
-  read_dir(argc, argv);
+  process_dir(argc, argv);
+
+  read_dir(argc);
 
   if (verbose)
   {
