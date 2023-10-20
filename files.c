@@ -29,9 +29,12 @@ void create_dirs(char *created, char *path)
     snprintf(exists, MAXPATHLEN, "%s%s", exists, first_dir);
     if (mkdir(exists) != 0)
     {
-      fprintf(stderr, "Could not create directory: %s\n", exists);
-      perror(__func__);
-      exit(EXIT_FAILURE);
+      if (errno != EEXIST)
+      {
+        fprintf(stderr, "Could not create directory: %s\n", exists);
+        perror(__func__);
+        exit(EXIT_FAILURE);
+      }
     }
 
     p++;
