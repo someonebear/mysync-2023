@@ -28,6 +28,7 @@ void validate_opt(int argc, char *argv[])
     case 'o':
       break;
     case 'p':
+      same_permission = true;
       break;
     case 'r':
       recursive = true;
@@ -107,7 +108,7 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
           printf("File found: %s\n", dp->d_name);
         }
         sprintf(rel_path, "%s%s", path_from_top, dp->d_name);
-        if (hashmap_add(hashmap_main, rel_path, top_level, stat_buffer.st_mtime))
+        if (hashmap_add(hashmap_main, rel_path, top_level, stat_buffer.st_mtime, stat_buffer.st_mode))
         {
           *(keys + key_count) = strdup(rel_path);
           key_count++;

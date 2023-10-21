@@ -36,6 +36,7 @@ typedef struct list_item
   // Top-level directory that this item is under.
   char *top_level;
   time_t mod_time;
+  mode_t mode;
   // Just in case of collisions. Full path minus top-level, i.e. the key
   char *path_from_top;
   struct list_item *next;
@@ -52,7 +53,7 @@ extern HASHMAP *hashmap_newest;
 
 extern HASHMAP *new_hashmap(void);
 
-extern bool hashmap_add(HASHMAP *, char *, char *, int);
+extern bool hashmap_add(HASHMAP *, char *, char *, time_t, mode_t);
 
 extern bool hashmap_find(HASHMAP *, char *, char *);
 

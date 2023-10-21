@@ -26,7 +26,7 @@ bool list_find(LIST *list, char *top_level, char *path_from_top)
   return false;
 }
 
-LIST *new_list_item(char *top_level, char *path_from_top, int mtime)
+LIST *new_list_item(char *top_level, char *path_from_top, time_t mtime, mode_t mode)
 {
   LIST *new = calloc(1, sizeof(LIST));
   CHECK_ALLOC(new);
@@ -38,13 +38,15 @@ LIST *new_list_item(char *top_level, char *path_from_top, int mtime)
   CHECK_ALLOC(new->path_from_top);
 
   new->mod_time = mtime;
+
+  new->mode = mode;
   new->next = NULL;
   return new;
 }
 
 // top_level is directory passed to mysync in command line
 // path_from_top if the path from the top_level to the file.
-LIST *list_add(LIST *list, char *path_from_top, char *top_level, int mtime)
+LIST *list_add(LIST *list, char *path_from_top, char *top_level, time_t mtime, mode_t mode)
 {
   if (list_find(list, top_level, path_from_top))
   {
@@ -52,7 +54,7 @@ LIST *list_add(LIST *list, char *path_from_top, char *top_level, int mtime)
   }
   else
   {
-    LIST *new = new_list_item(top_level, path_from_top, mtime);
+    LIST *new = new_list_item(top_level, path_from_top, mtime, mode);
     new->next = list;
     return new;
   }
@@ -65,7 +67,7 @@ void print_list(LIST *list)
     while (list != NULL)
     {
       time_t mtime = list->mod_time;
-      printf("File \"%s\" exists in directory: %s, (%s)\n", list->path_from_top, list->top_level, ctime(&mtime));
+      printf("File \"%s\" exists in directory: %s, last modified: %s", list->path_from_top, list->top_level, ctime(&mtime));
       list = list->next;
     }
   }
@@ -92,7 +94,7 @@ HASHMAP *new_hashmap(void)
 }
 
 // Return true if the key does not already exist.
-bool hashmap_add(HASHMAP *hashmap, char *path_from_top, char *top_level, int mtime)
+bool hashmap_add(HASHMAP *hashmap, char *path_from_top, char *top_level, time_t mtime, mode_t mode)
 {
   uint32_t h = hash_string(path_from_top) % hashmap_size;
   char *current;
@@ -106,7 +108,7 @@ bool hashmap_add(HASHMAP *hashmap, char *path_from_top, char *top_level, int mti
     CHECK_ALLOC(current);
   }
 
-  hashmap[h] = list_add(hashmap[h], path_from_top, top_level, mtime);
+  hashmap[h] = list_add(hashmap[h], path_from_top, top_level, mtime, mode);
 
   if (strcmp(hashmap[h]->path_from_top, current) == 0)
   {

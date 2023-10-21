@@ -1,3 +1,6 @@
+#include <utime.h>
+#include <time.h>
+
 #include "mysync.h"
 
 // Create all missing directories in path.
@@ -129,6 +132,21 @@ void sync_files(int num_dir)
           create_dirs(top_directories[dir], keys[key]);
           fcopy(source, dest);
         }
+        if (same_permission)
+        {
+          time_t mtime = file->mod_time;
+          if (verbose)
+          {
+            printf("Setting modification time of \"%s\" to %s", dest, ctime(&mtime));
+          }
+          chmod(dest, file->mode);
+          struct utimbuf ubuf;
+          time_t ctime;
+          time(&ctime);
+          ubuf.modtime = mtime;
+          ubuf.modtime = ctime;
+          utime(dest, &ubuf);
+        }
       }
     }
     free(mask);
@@ -176,7 +194,7 @@ void find_difference(int num_dir)
         {
           if (file->mod_time == newest_time)
           {
-            hashmap_add(hashmap_newest, file->path_from_top, file->top_level, file->mod_time);
+            hashmap_add(hashmap_newest, file->path_from_top, file->top_level, file->mod_time, file->mode);
             if (verbose)
             {
               printf("The newest version of \"%s\" is in directory \"%s\"\n", file->path_from_top, file->top_level);
