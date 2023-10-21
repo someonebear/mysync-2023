@@ -133,6 +133,7 @@ void sync_files(int num_dir)
           {
             printf("No directory creation needed to copy file \"%s\" to \"%s\"\n",
                    source, top_directories[dir]);
+            printf("File \"%s\" will be copied to \"%s%s\"\n", source, top_directories[dir], dir_tomake);
           }
           else
           {
@@ -140,8 +141,8 @@ void sync_files(int num_dir)
             *p = '\0';
             printf("Directory \"%s\" will be created in \"%s\"\n", dir_tomake, top_directories[dir]);
             printf("File \"%s\" will be copied to \"%s%s\"\n", source, top_directories[dir], dir_tomake);
-            free(dir_tomake);
           }
+          free(dir_tomake);
         }
         if (!no_sync)
         {

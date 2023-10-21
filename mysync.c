@@ -33,10 +33,5 @@ int main(int argc, char *argv[])
   // Actual copying of files.
   sync_files(argc);
 
-  if (verbose)
-  {
-    print_hashmap(hashmap_main);
-  }
-
   return 0;
 }

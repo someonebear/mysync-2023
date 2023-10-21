@@ -267,8 +267,8 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
   if (mode == 's')
   {
     closedir(dirp);
+    printf("\n");
   }
-  printf("\n");
 }
 
 // In case of absolute paths with tildes. Expand all paths to something we can open.
