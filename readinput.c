@@ -124,7 +124,7 @@ bool match_ignore(char *filename)
   }
   if (verbose)
   {
-    printf("File \"%s\" matches no -i patterns.\n");
+    printf("File \"%s\" matches no -i patterns.\n", filename);
   }
   return false;
 }
@@ -167,7 +167,7 @@ bool match_only(char *filename)
   }
   if (verbose)
   {
-    printf("File \"%s\" matches no -o patterns.\n");
+    printf("File \"%s\" matches no -o patterns.\n", filename);
   }
   return false;
 }
