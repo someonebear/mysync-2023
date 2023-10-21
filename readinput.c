@@ -184,10 +184,10 @@ char *add_slash(char *string)
   }
   else
   {
-    string = realloc(string, length + 1);
-    CHECK_ALLOC(string);
-    sprintf(string, "%s/", string);
-    return string;
+    char *new_string = malloc((length + 1) * sizeof(char));
+    CHECK_ALLOC(new_string);
+    sprintf(new_string, "%s/", string);
+    return new_string;
   }
 }
 
