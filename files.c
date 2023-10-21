@@ -4,32 +4,38 @@
 #include "mysync.h"
 
 // Create all missing directories in path.
-void create_dirs(char *created, char *path)
+void create_dirs(char *existing, char *path)
 {
-  // maybe pass top_level and path_from_top to this function, then we can create next level down with
-  //  %s%s, top_level, next_level,
-  //  with next_level being like %s/%*s sscanf or something
-  char to_create[MAXPATHLEN];
+
+  // part of path that already exists.
   char exists[MAXPATHLEN];
 
+  // rest of path.
+  char to_create[MAXPATHLEN];
+
+  strcpy(exists, existing);
   strcpy(to_create, path);
-  strcpy(exists, created);
 
   char *p = strchr(to_create, '/');
-  // base case, just a file, no directories.
+  // Base case of function. If no more directories in path, return.
   if (p == NULL)
   {
     return;
   }
-  // recursive step, make first directory in "to_create", and remove from "to_create", add to "exists"
+  // Recursive step.
+  // If first directory in "to_create" does not exist, create it.
+  // If it already exists, move directory to "exists", and recurse function on rest of path.
   else
   {
+    // Find first directory in "to create".
     char *first_dir = strdup(to_create);
     char *p2 = strchr(first_dir, '/');
     p2++;
     *p2 = '\0';
 
+    // Move first directory to "exists".
     snprintf(exists, MAXPATHLEN, "%s%s", exists, first_dir);
+    free(first_dir);
     if (mkdir(exists) != 0)
     {
       if (errno != EEXIST)
@@ -40,13 +46,14 @@ void create_dirs(char *created, char *path)
       }
     }
 
+    // p is rest of "to_create" after the first directory was created.
     p++;
     strcpy(to_create, p);
     create_dirs(exists, to_create);
   }
 }
-// Go along entire path, if directory exists, move on, if it doesnt, create it.
 
+// Copy source to dest.
 void fcopy(char *source, char *dest)
 {
   FILE *fp_source = fopen(source, "r");
@@ -63,7 +70,7 @@ void fcopy(char *source, char *dest)
     {
       fclose(fp_source);
       fclose(fp_dest);
-      fprintf(stderr, "Error copying to file.\n");
+      fprintf(stderr, "Error opening file.\n");
       perror(__func__);
       exit(EXIT_FAILURE);
     }
@@ -84,34 +91,44 @@ void fcopy(char *source, char *dest)
   fclose(fp_dest);
 }
 
+// Synchronise older files, or create files, that match the newest version of that file.
 void sync_files(int num_dir)
 {
+  // Iterate through keys of hashmap. i.e. the unique files.
   for (int key = 0; key < key_count; key++)
   {
     LIST *file;
+    // Boolean mask of directories passed to program.
     bool *mask = calloc(num_dir, sizeof(bool));
     for (int dir = 0; dir < num_dir; dir++)
     {
+      // If directory does not have the newest version of the file, or does not exist, set mask[dir] to false.
       mask[dir] = hashmap_find(hashmap_newest, keys[key], top_directories[dir]);
       if (mask[dir] == true)
       {
+        // If directory does have the newest version, we keep track of the file.
         file = hashmap_return(hashmap_newest, keys[key], top_directories[dir]);
       }
     }
 
+    // Path of the newest version of the file.
     char source[MAXPATHLEN];
     snprintf(source, MAXPATHLEN, "%s%s", file->top_level, file->path_from_top);
     char dest[MAXPATHLEN];
 
+    // Iterate over each directory passed to program.
     for (int dir = 0; dir < num_dir; dir++)
     {
+      // If directory does not have the newest version...
       if (mask[dir] == false)
       {
+        // ...set dest to this directory.
         snprintf(dest, MAXPATHLEN, "%s%s", top_directories[dir], keys[key]);
         if (verbose)
         {
           char *dir_tomake = strdup(keys[key]);
           char *p = strrchr(dir_tomake, '/');
+          // Check if there are any directories in path.
           if (p == NULL)
           {
             printf("No directory creation needed to copy file \"%s\" to \"%s\"\n",
@@ -121,7 +138,6 @@ void sync_files(int num_dir)
           {
             p++;
             *p = '\0';
-
             printf("Directory \"%s\" will be created in \"%s\"\n", dir_tomake, top_directories[dir]);
             printf("File \"%s\" will be copied to \"%s%s\"\n", source, top_directories[dir], dir_tomake);
             free(dir_tomake);
@@ -129,9 +145,11 @@ void sync_files(int num_dir)
         }
         if (!no_sync)
         {
+          // Only create directories and copy files over if -n is not provided.
           create_dirs(top_directories[dir], keys[key]);
           fcopy(source, dest);
         }
+        // Set permissions of new files to 'old' newest file if -p is provided.
         if (same_permission)
         {
           time_t mtime = file->mod_time;
@@ -139,57 +157,54 @@ void sync_files(int num_dir)
           {
             printf("Setting modification time of \"%s\" to %s", dest, ctime(&mtime));
           }
+          // Set permissions
           chmod(dest, file->mode);
+
+          // Set modification time.
           struct utimbuf ubuf;
           time_t ctime;
           time(&ctime);
           ubuf.modtime = mtime;
-          ubuf.modtime = ctime;
+          ubuf.actime = ctime;
           utime(dest, &ubuf);
         }
       }
     }
     free(mask);
   }
+  printf("\n");
 }
-// Create bitmask for each key, indicating which top directory has up-to-date, and which has older/doesnt exist
-// Call create_dir to create directories on path if file doesn't exist
 
+// Find newest version of all files.
 void find_difference(int num_dir)
 {
-  // For each key, and top-level, hashmap_find.
-  // If it exists, compare to newest version. Newest versions get added to hashmap_newest.
-  // If -n is called, i guess call sync-files with 'n' mode
-  // If not, call sync-files with some other mode.
-  LIST *file;
-  // LIST **newest_file = calloc(num_dir, sizeof(LIST *));
-  time_t newest_time = 0;
 
+  LIST *file;
+  time_t newest_time = 0;
   hashmap_newest = new_hashmap();
 
+  // For each unique file under any "top level" directory
   for (int key = 0; key < key_count; key++)
   {
     for (int pass = 0; pass < 2; pass++)
     {
+      // For each "top level" directory.
       for (int dir = 0; dir < num_dir; dir++)
       {
-        // its actually giving seg fault here.
-        // Num_files is actually counting test3.txt twice.
-        // I wasn't incrementing key_count.
         file = hashmap_return(hashmap_main, keys[key], top_directories[dir]);
         if (file == NULL)
         {
           continue;
         }
+        // First pass simply finds the modification time of the newest file.
         else if (pass == 0)
         {
           if (difftime(file->mod_time, newest_time) >= 0)
           {
-            // This is setting each file newer than the last in the array.
-            // Must change to only set the newest file for all of them.
             newest_time = file->mod_time;
           }
         }
+        // Second pass stores any files that match the newest modification time.
         else if (pass == 1)
         {
           if (file->mod_time == newest_time)
@@ -200,10 +215,11 @@ void find_difference(int num_dir)
               printf("The newest version of \"%s\" is in directory \"%s\"\n", file->path_from_top, file->top_level);
             }
           }
-          // Add to newest_file
         }
       }
     }
+    // Reset newest_time.
     newest_time = 0;
   }
+  printf("\n");
 }

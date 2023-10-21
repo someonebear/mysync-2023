@@ -1,23 +1,25 @@
 #include "mysync.h"
 
-// TODO: Maybe move #include statements that only get used in one file to that file.
-// TODO: Check that functions only used in one file are only declared in that file.
-// TODO: free() dynamic memory as soon as they are finished.
-
 int main(int argc, char *argv[])
 {
+  // Read and store options.
   validate_opt(argc, argv);
 
+  // Setting argc to number of non option arguments.
+  // Setting argv to first non option argument.
   argc -= optind;
   argv += optind;
+
   if (argc < 2)
   {
     fprintf(stderr, "Two or more directories are required to sync.\n");
     usage();
   }
 
+  // Expand tilde if needed. Store directory names.
   process_dir(argc, argv);
 
+  // Read contents of directories.
   read_dir(argc);
 
   if (verbose)
@@ -25,8 +27,10 @@ int main(int argc, char *argv[])
     print_hashmap(hashmap_main);
   }
 
+  // Find differences between directories passed to program.
   find_difference(argc);
 
+  // Actual copying of files.
   sync_files(argc);
 
   if (verbose)

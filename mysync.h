@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
 #include <stdbool.h>
-#include <dirent.h>
-#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <stdint.h>
+#include <getopt.h>
 
 // From Workshop 8
 #define CHECK_ALLOC(p)  \
@@ -23,21 +21,19 @@
 
 // Variables to hold flag values
 extern bool all_files;
-extern char *ignore;
 extern bool no_sync;
-extern char *only_sync;
 extern bool same_permission;
 extern bool recursive;
 extern bool verbose;
 
-// Hashmap declarations
+// Hashmap type declarations
 typedef struct list_item
 {
-  // Top-level directory that this item is under.
+  // Top-level directory that this item is under. i.e. one of the directories passed to program.
   char *top_level;
   time_t mod_time;
   mode_t mode;
-  // Just in case of collisions. Full path minus top-level, i.e. the key
+  // Relative path from top directory. also the key of the hashmap.
   char *path_from_top;
   struct list_item *next;
 } LIST;
@@ -48,9 +44,11 @@ typedef LIST *HASHMAP;
 extern int num_files;
 extern int hashmap_size;
 
+// Global hashmaps
 extern HASHMAP *hashmap_main;
 extern HASHMAP *hashmap_newest;
 
+// Hashmap functions
 extern HASHMAP *new_hashmap(void);
 
 extern bool hashmap_add(HASHMAP *, char *, char *, time_t, mode_t);
