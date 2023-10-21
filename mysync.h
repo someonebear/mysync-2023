@@ -76,3 +76,5 @@ extern void read_dir(int);
 
 extern void find_difference(int);
 extern void sync_files(int);
+
+extern char *glob2regex(char *);
