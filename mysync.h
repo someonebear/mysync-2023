@@ -70,6 +70,8 @@ extern char **keys;
 extern int key_count;
 
 // Global functions
+extern char *strdup(const char *str);
+
 extern void usage(void);
 extern void validate_opt(int, char *[]);
 extern void process_dir(int, char *[]);

@@ -264,7 +264,10 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
     }
   }
   // Close current directory when done.
-  closedir(dirp);
+  if (mode == 's')
+  {
+    closedir(dirp);
+  }
   printf("\n");
 }
 

@@ -1,4 +1,5 @@
 #include <utime.h>
+#include <errno.h>
 
 #include "mysync.h"
 
@@ -33,9 +34,9 @@ void create_dirs(char *existing, char *path)
     *p2 = '\0';
 
     // Move first directory to "exists".
-    snprintf(exists, MAXPATHLEN, "%s%s", exists, first_dir);
+    strcat(exists, first_dir);
     free(first_dir);
-    if (mkdir(exists) != 0)
+    if (mkdir(exists, 0777) != 0)
     {
       if (errno != EEXIST)
       {
