@@ -341,13 +341,13 @@ void read_dir(int num_dir)
     printf("\n");
   }
 
+  if (verbose)
+  {
+    printf("Counting number of files in directories provided:\n");
+  }
   for (int i = 0; i < num_dir; i++)
   {
     // Count how many files exist, for hashmap size.
-    if (verbose)
-    {
-      printf("Counting number of files in directories provided:\n");
-    }
     find_files(directories[i], *(top_directories + i), "", 'c');
     rewinddir(directories[i]);
   }
@@ -368,13 +368,14 @@ void read_dir(int num_dir)
   // Initialise array to store keys of hashmap.
   keys = calloc(num_files, sizeof(char *));
 
+  if (verbose)
+  {
+    printf("Storing files found in hashmap.\n");
+  }
   for (int i = 0; i < num_dir; i++)
   {
     // Store each file in hashmap.
-    if (verbose)
-    {
-      printf("Storing files found in hashmap.\n");
-    }
+
     find_files(directories[i], *(top_directories + i), "", 's');
   }
 }
