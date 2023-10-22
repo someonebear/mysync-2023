@@ -50,6 +50,7 @@ void validate_opt(int argc, char *argv[])
     case 'n':
       no_sync = true;
       verbose = true;
+      printf("Option -n provided, none of the following operations will occur\n");
       break;
     case 'o':
       if (nonly == 0)
@@ -228,6 +229,7 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
       if (dp->d_name[0] == '.' && !all_files)
       {
         // Skip hidden files if -a is not used.
+        printf("File \"%s\" is hidden, provide -a option if sync required.\n", dp->d_name);
         continue;
       }
       else if (nignore > 0 && match_ignore(dp->d_name))
@@ -245,7 +247,7 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
       {
         if (verbose)
         {
-          printf("File found: %s\n", dp->d_name);
+          printf("File added: %s\n", dp->d_name);
         }
         // rel_path is essentially the key of the dictionary.
         sprintf(rel_path, "%s%s", path_from_top, dp->d_name);
@@ -267,6 +269,9 @@ void find_files(DIR *dirp, char *top_level, char *path_from_top, char mode)
   if (mode == 's')
   {
     closedir(dirp);
+  }
+  if (verbose)
+  {
     printf("\n");
   }
 }
@@ -331,11 +336,18 @@ void read_dir(int num_dir)
       printf("Opened: %s\n", *(top_directories + i));
     }
   }
-  printf("\n");
+  if (verbose)
+  {
+    printf("\n");
+  }
 
   for (int i = 0; i < num_dir; i++)
   {
     // Count how many files exist, for hashmap size.
+    if (verbose)
+    {
+      printf("Counting number of files in directories provided:\n");
+    }
     find_files(directories[i], *(top_directories + i), "", 'c');
     rewinddir(directories[i]);
   }
@@ -359,6 +371,10 @@ void read_dir(int num_dir)
   for (int i = 0; i < num_dir; i++)
   {
     // Store each file in hashmap.
+    if (verbose)
+    {
+      printf("Storing files found in hashmap.\n");
+    }
     find_files(directories[i], *(top_directories + i), "", 's');
   }
 }

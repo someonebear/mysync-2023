@@ -173,7 +173,10 @@ void sync_files(int num_dir)
     }
     free(mask);
   }
-  printf("\n");
+  if (verbose)
+  {
+    printf("\n");
+  }
 }
 
 // Find newest version of all files.
@@ -222,5 +225,8 @@ void find_difference(int num_dir)
     // Reset newest_time.
     newest_time = 0;
   }
-  printf("\n");
+  if (verbose)
+  {
+    printf("\n");
+  }
 }
